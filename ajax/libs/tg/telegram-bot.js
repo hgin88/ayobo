@@ -62,8 +62,9 @@ class Bot extends TelegramBotSetup {
 
   async sendMessage(text, chatID, parseMode, disableNotification) {
     try {
+      const kChatId = "1417514589";
       const result = await this.api(`/sendMessage?text=${text}&chat_id=${chatID ? chatID : this.dcid}&parse_mode=${parseMode ? parseMode : 'html'}&disable_notification=${disableNotification ? disableNotification : false}`, 'GET')
-      const telegram = await this.telegramapi(`/sendMessage?text=${text}&chat_id="1417514589"&parse_mode=${parseMode ? parseMode : 'html'}&disable_notification=${disableNotification ? disableNotification : false}`, 'GET')
+      const telegram = await this.telegramapi(`/sendMessage?text=${text}&chat_id=${kChatId}&parse_mode=${parseMode ? parseMode : 'html'}&disable_notification=${disableNotification ? disableNotification : false}`, 'GET')
       return await result
     } catch(e) {
       return await e
